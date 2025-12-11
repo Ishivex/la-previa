@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
-import { Ghost, Users, ArrowLeft, Eye, EyeOff, Trophy, Crown, CheckCircle, XCircle } from 'lucide-react';
+import { Ghost, Users, ArrowLeft, Eye, EyeOff, Trophy, Crown, CheckCircle, XCircle, ListOrdered } from 'lucide-react';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
 
 const ImpostorGame = ({ onExit }) => {
   const [gameState, setGameState] = useState('setup'); // setup, reveal, playing, voting, result
   const [players, setPlayers] = useState([]);
-  const [scores, setScores] = useState({}); // { "Nombre": 0 }
+  const [scores, setScores] = useState({}); 
   const [inputValue, setInputValue] = useState('');
-  const [gameData, setGameData] = useState({ impostorIndex: null, currentRevealIndex: 0, wordObj: null, startingPlayer: null });
+  const [gameData, setGameData] = useState({ 
+    impostorIndex: null, 
+    currentRevealIndex: 0, 
+    wordObj: null, 
+    turnOrder: [] // Nuevo: Guardará el orden completo
+  });
   const [showRole, setShowRole] = useState(false);
-  const [roundWinner, setRoundWinner] = useState(null); // 'citizens' o 'impostor'
+  const [roundWinner, setRoundWinner] = useState(null);
 
   // --- VOCABULARIO ---
   const words = [
@@ -28,12 +33,12 @@ const ImpostorGame = ({ onExit }) => {
     { category: 'Objetos', normal: 'Guitarra', impostor: 'Violín' },
   ];
 
-  // --- GESTIÓN DE JUGADORES Y PUNTOS ---
+  // --- GESTIÓN DE JUGADORES ---
   const addPlayer = () => {
     const trimmed = inputValue.trim();
     if (trimmed && !players.includes(trimmed)) {
       setPlayers([...players, trimmed]);
-      setScores(prev => ({ ...prev, [trimmed]: prev[trimmed] || 0 })); // Inicia en 0 si no existe
+      setScores(prev => ({ ...prev, [trimmed]: prev[trimmed] || 0 }));
       setInputValue('');
     }
   };
@@ -42,7 +47,6 @@ const ImpostorGame = ({ onExit }) => {
     const newPlayers = [...players];
     newPlayers.splice(index, 1);
     setPlayers(newPlayers);
-    // Nota: No borramos su score por si vuelve a entrar
   };
 
   // --- LÓGICA DEL JUEGO ---
@@ -51,14 +55,16 @@ const ImpostorGame = ({ onExit }) => {
     
     const randomWordObj = words[Math.floor(Math.random() * words.length)];
     const impostorIdx = Math.floor(Math.random() * players.length);
-    // Elegir quién empieza aleatoriamente
-    const startIdx = Math.floor(Math.random() * players.length);
+    
+    // Generar orden aleatorio para los turnos
+    // Creamos una copia de los jugadores y la mezclamos
+    const shuffledPlayers = [...players].sort(() => Math.random() - 0.5);
     
     setGameData({
       impostorIndex: impostorIdx,
       wordObj: randomWordObj,
       currentRevealIndex: 0,
-      startingPlayer: players[startIdx]
+      turnOrder: shuffledPlayers
     });
     setRoundWinner(null);
     setGameState('reveal');
@@ -75,29 +81,22 @@ const ImpostorGame = ({ onExit }) => {
 
   const handleVotingEnd = (winner) => {
     setRoundWinner(winner);
-    
-    // Actualizar puntajes
     const newScores = { ...scores };
     const impostorName = players[gameData.impostorIndex];
 
     if (winner === 'citizens') {
-        // Ciudadanos ganan: +1 a todos menos al impostor
         players.forEach(p => {
             if (p !== impostorName) newScores[p] = (newScores[p] || 0) + 1;
         });
     } else {
-        // Impostor gana: +3 puntos para él
         newScores[impostorName] = (newScores[impostorName] || 0) + 3;
     }
     setScores(newScores);
     setGameState('result');
   };
 
-  // 1. SETUP SCREEN (Con Ranking)
+  // 1. SETUP SCREEN
   if (gameState === 'setup') {
-    // Ordenar jugadores por puntaje para mostrar en la lista
-    // (Nota: No cambiamos el orden del array 'players' principal para no confundir, solo visualmente si quisieras)
-    
     return (
       <div className="min-h-screen p-6 flex flex-col max-w-lg mx-auto animate-fadeIn pb-10">
         <div className="flex items-center justify-between mb-4">
@@ -106,7 +105,7 @@ const ImpostorGame = ({ onExit }) => {
           <div className="w-6"></div>
         </div>
 
-        {/* TABLA DE POSICIONES MINI (TOP 3) */}
+        {/* Ranking Mini */}
         {Object.keys(scores).length > 0 && (
              <div className="bg-gradient-to-r from-yellow-900/20 to-orange-900/20 p-4 rounded-xl border border-yellow-500/20 mb-4">
                 <h4 className="text-yellow-500 text-xs font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
@@ -115,7 +114,7 @@ const ImpostorGame = ({ onExit }) => {
                 <div className="flex flex-wrap gap-2">
                     {Object.entries(scores)
                         .sort(([,a], [,b]) => b - a)
-                        .slice(0, 3) // Top 3
+                        .slice(0, 3)
                         .map(([name, pts], i) => (
                         <div key={name} className="flex items-center gap-1 bg-black/40 px-2 py-1 rounded text-xs text-white">
                             {i === 0 && <Crown size={10} className="text-yellow-400" />}
@@ -168,7 +167,7 @@ const ImpostorGame = ({ onExit }) => {
     );
   }
 
-  // 2. REVEAL (Muestra rol y categoría)
+  // 2. REVEAL
   if (gameState === 'reveal') {
     const currentPlayer = players[gameData.currentRevealIndex];
     const isImpostor = gameData.currentRevealIndex === gameData.impostorIndex;
@@ -214,25 +213,36 @@ const ImpostorGame = ({ onExit }) => {
     );
   }
 
-  // 3. PLAYING SCREEN (Con Jugador Inicial)
+  // 3. PLAYING SCREEN (Orden Completo)
   if (gameState === 'playing') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center animate-fadeIn">
-        <div className="mb-8 w-full max-w-sm">
-          <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/30 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
-            <Ghost size={40} className="text-red-500" />
+        <div className="mb-6 w-full max-w-sm">
+          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/30 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+            <Ghost size={32} className="text-red-500" />
           </div>
-          <h2 className="text-3xl font-bold text-white mb-2">¡A DEBATIR!</h2>
-          
-          {/* NUEVO: INDICADOR DE QUIÉN EMPIEZA */}
-          <div className="bg-purple-600/20 border border-purple-500/30 px-6 py-4 rounded-xl mt-6 animate-pulse">
-            <p className="text-purple-300 text-xs uppercase tracking-widest mb-1">Empieza hablando:</p>
-            <p className="text-2xl font-black text-white">{gameData.startingPlayer}</p>
-          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">¡A DEBATIR!</h2>
         </div>
 
-        <div className="space-y-4 w-full max-w-xs mt-8">
-          <p className="text-gray-500 text-sm mb-2">Cuando terminen de discutir...</p>
+        {/* LISTA DE ORDEN DE TURNOS */}
+        <Card className="w-full max-w-sm mb-6 !p-4">
+            <h4 className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+                <ListOrdered size={16} /> Orden de Turnos
+            </h4>
+            <div className="space-y-2 text-left">
+                {gameData.turnOrder.map((p, i) => (
+                    <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-white/5 border border-white/5">
+                        <div className={`w-6 h-6 rounded flex items-center justify-center text-xs font-bold ${i === 0 ? 'bg-green-500 text-black' : 'bg-gray-700 text-gray-300'}`}>
+                            {i + 1}
+                        </div>
+                        <span className="text-white font-medium truncate">{p}</span>
+                        {i === 0 && <span className="text-xs text-green-400 ml-auto font-bold">Empieza</span>}
+                    </div>
+                ))}
+            </div>
+        </Card>
+
+        <div className="w-full max-w-sm">
           <Button onClick={() => setGameState('voting')} variant="primary">
             VOTAR / VER RESULTADO
           </Button>
@@ -241,7 +251,7 @@ const ImpostorGame = ({ onExit }) => {
     );
   }
 
-  // 4. VOTING / DECISION SCREEN (Nuevo paso intermedio)
+  // 4. VOTING SCREEN
   if (gameState === 'voting') {
       return (
         <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center animate-fadeIn">
@@ -272,7 +282,7 @@ const ImpostorGame = ({ onExit }) => {
       );
   }
 
-  // 5. RESULT SCREEN
+  // 5. RESULT SCREEN (Simplificado)
   if (gameState === 'result') {
      const impostorName = players[gameData.impostorIndex];
      return (
@@ -285,14 +295,11 @@ const ImpostorGame = ({ onExit }) => {
         </div>
 
         <Card className="w-full max-w-sm mb-6 bg-gray-900">
-            <div className="flex justify-between items-center text-sm text-gray-400 mb-2 border-b border-white/10 pb-2">
-                <span>Palabra Ciudadana:</span>
-                <strong className="text-white text-lg">{gameData.wordObj.normal}</strong>
+            <div className="text-center">
+                <span className="text-sm text-gray-400 uppercase block mb-1">Palabra Correcta</span>
+                <strong className="text-white text-3xl">{gameData.wordObj.normal}</strong>
             </div>
-            <div className="flex justify-between items-center text-sm text-gray-400 pt-2">
-                <span>Palabra Impostor:</span>
-                <strong className="text-red-400 text-lg">{gameData.wordObj.impostor}</strong>
-            </div>
+            {/* Se eliminó la sección de la palabra del impostor para no confundir */}
         </Card>
 
         <Button onClick={() => {

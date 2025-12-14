@@ -66,7 +66,7 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         name: 'Cultura Chupística', 
         icon: <Brain size={32} />, 
         color: 'from-pink-500 to-rose-500', 
-        active: false, 
+        active: true, 
         desc: 'Nombra cosas de una categoría sin repetir.' 
     },
     { 

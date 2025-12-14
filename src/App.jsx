@@ -4,9 +4,11 @@ import {
   Brain, Crown, Bomb, Video, Fingerprint 
 } from 'lucide-react';
 import Button from './components/Button';
-// Importamos los juegos activos
+
+// --- IMPORTANTE: AQUÍ IMPORTAMOS LOS JUEGOS ---
 import ImpostorGame from './games/impostor/ImpostorGame';
 import NeverHaveIEver from './games/never-have-i-ever/NeverHaveIEver';
+import MostLikelyTo from './games/most-likely/MostLikelyTo'; // <--- ¡Esta línea activa el nuevo juego!
 
 // --- PANTALLAS SIMPLES ---
 
@@ -26,7 +28,7 @@ const LandingScreen = ({ onStart }) => (
         <Play size={24} /> ENTRAR
       </Button>
     </div>
-    <span className="text-xs text-gray-600 fixed bottom-4">v1.5.0 • React • Tailwind</span>
+    <span className="text-xs text-gray-600 fixed bottom-4">v1.6.0 • React • Tailwind</span>
   </div>
 );
 
@@ -49,16 +51,16 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         active: true, 
         desc: 'Frases picantes. Si lo hiciste, bebes.' 
     },
-    
-    // --- PRÓXIMAMENTE (Juegos planificados) ---
     { 
         id: 'likely', 
         name: 'Quién es más probable', 
         icon: <Fingerprint size={32} />, 
         color: 'from-blue-500 to-indigo-600', 
-        active: false, 
+        active: true, // <--- ¡AQUÍ ES DONDE LO ACTIVAMOS (Estaba en false antes)!
         desc: 'Señala al amigo que encaje con la tarjeta.' 
     },
+    
+    // --- PRÓXIMAMENTE ---
     { 
         id: 'culture', 
         name: 'Cultura Chupística', 
@@ -120,7 +122,7 @@ const GameMenu = ({ onSelectGame, onBack }) => {
             className={`relative group overflow-hidden rounded-2xl p-6 text-left transition-all duration-300 border border-white/5 
               ${!game.active ? 'opacity-60 grayscale cursor-not-allowed bg-white/5' : 'hover:scale-[1.02] hover:shadow-2xl bg-gray-900'}`}
           >
-            {/* Fondo con gradiente (si está activo se ve full, si no, se ve tenue) */}
+            {/* Fondo con gradiente */}
             <div className={`absolute inset-0 bg-gradient-to-br ${game.color} ${game.active ? 'opacity-20 group-hover:opacity-30' : 'opacity-5'} transition-opacity`}></div>
             
             <div className="relative z-10 flex items-start justify-between">
@@ -162,8 +164,9 @@ const App = () => {
         return <ImpostorGame onExit={backToMenu} />;
       case 'game-never':
         return <NeverHaveIEver onExit={backToMenu} />;
+      case 'game-likely':
+        return <MostLikelyTo onExit={backToMenu} />; // <--- ¡Aquí le decimos qué pantalla mostrar!
       
-      // JUEGOS FUTUROS (Por seguridad, si alguien fuerza el estado)
       default:
         return <GameMenu onSelectGame={(id) => setScreen(`game-${id}`)} />;
     }

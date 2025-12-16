@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Play, Ghost, Beer, HelpCircle, ArrowLeft, 
-  Brain, Crown, Bomb, Video, Fingerprint 
+  Brain, Crown, Bomb, Video, Fingerprint, Lock 
 } from 'lucide-react';
 import Button from './components/Button';
 
@@ -12,7 +12,8 @@ import MostLikelyTo from './games/most-likely/MostLikelyTo';
 import CulturaChupistica from './games/cultura-chupistica/CulturaChupistica';
 import MimicGame from './games/mimic/MimicGame';
 import TruthOrDare from './games/truth-or-dare/TruthOrDare';
-import KingGame from './games/king/KingGame'; // <--- Nuevo Import
+import KingGame from './games/king/KingGame';
+import BombGame from './games/bomb/BombGame'; // <--- Nuevo Import de La Bomba
 
 // --- PANTALLAS SIMPLES ---
 
@@ -32,7 +33,7 @@ const LandingScreen = ({ onStart }) => (
         <Play size={24} /> ENTRAR
       </Button>
     </div>
-    <span className="text-xs text-gray-600 fixed bottom-4">v1.9.0 • React • Tailwind</span>
+    <span className="text-xs text-gray-600 fixed bottom-4">v2.0.0 • React • Tailwind</span>
   </div>
 );
 
@@ -44,7 +45,7 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         name: 'El Reino', 
         icon: <Crown size={32} />, 
         color: 'from-amber-400 to-yellow-600', 
-        active: true, // <--- ACTIVADO (Nuevo juego)
+        active: true, 
         desc: 'Juzga qué tanto te conocen tus amigos.' 
     },
     { 
@@ -54,6 +55,14 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         color: 'from-red-500 to-orange-600', 
         active: true, 
         desc: 'Descubre quién miente entre tus amigos.' 
+    },
+    { 
+        id: 'bomb', 
+        name: 'La Bomba', 
+        icon: <Bomb size={32} />, 
+        color: 'from-orange-500 to-red-700', 
+        active: true, // <--- ACTIVADO
+        desc: 'Responde rápido antes de que explote.' 
     },
     { 
         id: 'never', 
@@ -96,14 +105,14 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         desc: 'Confiesa tus secretos o cumple el reto.' 
     },
     
-    // --- PRÓXIMAMENTE ---
+    // --- PRÓXIMAMENTE (MISTERIO) ---
     { 
-        id: 'bomb', 
-        name: 'La Bomba', 
-        icon: <Bomb size={32} />, 
-        color: 'from-orange-500 to-red-700', 
+        id: 'mystery', 
+        name: '?????', 
+        icon: <Lock size={32} />, 
+        color: 'from-gray-700 to-gray-900', 
         active: false, 
-        desc: 'Responde rápido antes de que explote.' 
+        desc: 'Un nuevo modo de juego está en camino...' 
     },
   ];
 
@@ -181,7 +190,9 @@ const App = () => {
       case 'game-truth':
         return <TruthOrDare onExit={backToMenu} />;
       case 'game-king':
-        return <KingGame onExit={backToMenu} />; // <--- Nueva Ruta Activada
+        return <KingGame onExit={backToMenu} />;
+      case 'game-bomb':
+        return <BombGame onExit={backToMenu} />; // <--- Nueva Ruta Activada
       
       default:
         return <GameMenu onSelectGame={(id) => setScreen(`game-${id}`)} />;

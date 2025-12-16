@@ -5,10 +5,13 @@ import {
 } from 'lucide-react';
 import Button from './components/Button';
 
-// --- IMPORTANTE: AQUÍ IMPORTAMOS LOS JUEGOS ---
+// --- IMPORTAMOS TODOS LOS JUEGOS ---
 import ImpostorGame from './games/impostor/ImpostorGame';
 import NeverHaveIEver from './games/never-have-i-ever/NeverHaveIEver';
-import MostLikelyTo from './games/most-likely/MostLikelyTo'; // <--- ¡Esta línea activa el nuevo juego!
+import MostLikelyTo from './games/most-likely/MostLikelyTo';
+import CulturaChupistica from './games/cultura-chupistica/CulturaChupistica';
+import MimicGame from './games/mimic/MimicGame';          // <--- Nuevo Import
+import TruthOrDare from './games/truth-or-dare/TruthOrDare'; // <--- Nuevo Import
 
 // --- PANTALLAS SIMPLES ---
 
@@ -28,7 +31,7 @@ const LandingScreen = ({ onStart }) => (
         <Play size={24} /> ENTRAR
       </Button>
     </div>
-    <span className="text-xs text-gray-600 fixed bottom-4">v1.6.0 • React • Tailwind</span>
+    <span className="text-xs text-gray-600 fixed bottom-4">v1.8.0 • React • Tailwind</span>
   </div>
 );
 
@@ -56,19 +59,35 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         name: 'Quién es más probable', 
         icon: <Fingerprint size={32} />, 
         color: 'from-blue-500 to-indigo-600', 
-        active: true, // <--- ¡AQUÍ ES DONDE LO ACTIVAMOS (Estaba en false antes)!
+        active: true, 
         desc: 'Señala al amigo que encaje con la tarjeta.' 
     },
-    
-    // --- PRÓXIMAMENTE ---
     { 
         id: 'culture', 
         name: 'Cultura Chupística', 
         icon: <Brain size={32} />, 
         color: 'from-pink-500 to-rose-500', 
-        active: true, 
+        active: true,
         desc: 'Nombra cosas de una categoría sin repetir.' 
     },
+    { 
+        id: 'mimic', 
+        name: 'Mímica', 
+        icon: <Video size={32} />, 
+        color: 'from-teal-400 to-emerald-600', 
+        active: true, // <--- ACTIVADO
+        desc: 'Actúa para que tu equipo adivine en 60s.' 
+    },
+    { 
+        id: 'truth', 
+        name: 'Verdad o Reto', 
+        icon: <HelpCircle size={32} />, 
+        color: 'from-violet-500 to-purple-700', 
+        active: true, // <--- ACTIVADO
+        desc: 'Confiesa tus secretos o cumple el reto.' 
+    },
+    
+    // --- PRÓXIMAMENTE ---
     { 
         id: 'kings', 
         name: 'Copa del Rey', 
@@ -84,22 +103,6 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         color: 'from-orange-500 to-red-700', 
         active: false, 
         desc: 'Responde rápido antes de que explote.' 
-    },
-    { 
-        id: 'mimic', 
-        name: 'Mímica', 
-        icon: <Video size={32} />, 
-        color: 'from-teal-400 to-emerald-600', 
-        active: false, 
-        desc: 'Actúa para que tu equipo adivine.' 
-    },
-    { 
-        id: 'truth', 
-        name: 'Verdad o Reto', 
-        icon: <HelpCircle size={32} />, 
-        color: 'from-violet-500 to-purple-700', 
-        active: false, 
-        desc: 'Confiesa tus secretos o cumple el reto.' 
     },
   ];
 
@@ -117,7 +120,11 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         {games.map((game) => (
           <button
             key={game.id}
-            onClick={() => game.active && onSelectGame(game.id)}
+            onClick={() => {
+                if (game.active) {
+                    onSelectGame(game.id);
+                }
+            }}
             disabled={!game.active}
             className={`relative group overflow-hidden rounded-2xl p-6 text-left transition-all duration-300 border border-white/5 
               ${!game.active ? 'opacity-60 grayscale cursor-not-allowed bg-white/5' : 'hover:scale-[1.02] hover:shadow-2xl bg-gray-900'}`}
@@ -165,7 +172,13 @@ const App = () => {
       case 'game-never':
         return <NeverHaveIEver onExit={backToMenu} />;
       case 'game-likely':
-        return <MostLikelyTo onExit={backToMenu} />; // <--- ¡Aquí le decimos qué pantalla mostrar!
+        return <MostLikelyTo onExit={backToMenu} />;
+      case 'game-culture':
+        return <CulturaChupistica onExit={backToMenu} />;
+      case 'game-mimic':
+        return <MimicGame onExit={backToMenu} />;       // <--- Nueva Ruta
+      case 'game-truth':
+        return <TruthOrDare onExit={backToMenu} />;     // <--- Nueva Ruta
       
       default:
         return <GameMenu onSelectGame={(id) => setScreen(`game-${id}`)} />;

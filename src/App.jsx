@@ -10,8 +10,9 @@ import ImpostorGame from './games/impostor/ImpostorGame';
 import NeverHaveIEver from './games/never-have-i-ever/NeverHaveIEver';
 import MostLikelyTo from './games/most-likely/MostLikelyTo';
 import CulturaChupistica from './games/cultura-chupistica/CulturaChupistica';
-import MimicGame from './games/mimic/MimicGame';          // <--- Nuevo Import
-import TruthOrDare from './games/truth-or-dare/TruthOrDare'; // <--- Nuevo Import
+import MimicGame from './games/mimic/MimicGame';
+import TruthOrDare from './games/truth-or-dare/TruthOrDare';
+import KingGame from './games/king/KingGame'; // <--- Nuevo Import
 
 // --- PANTALLAS SIMPLES ---
 
@@ -31,13 +32,21 @@ const LandingScreen = ({ onStart }) => (
         <Play size={24} /> ENTRAR
       </Button>
     </div>
-    <span className="text-xs text-gray-600 fixed bottom-4">v1.8.0 • React • Tailwind</span>
+    <span className="text-xs text-gray-600 fixed bottom-4">v1.9.0 • React • Tailwind</span>
   </div>
 );
 
 const GameMenu = ({ onSelectGame, onBack }) => {
   const games = [
     // --- JUEGOS ACTIVOS ---
+    { 
+        id: 'king', 
+        name: 'El Reino', 
+        icon: <Crown size={32} />, 
+        color: 'from-amber-400 to-yellow-600', 
+        active: true, // <--- ACTIVADO (Nuevo juego)
+        desc: 'Juzga qué tanto te conocen tus amigos.' 
+    },
     { 
         id: 'impostor', 
         name: 'El Impostor', 
@@ -75,7 +84,7 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         name: 'Mímica', 
         icon: <Video size={32} />, 
         color: 'from-teal-400 to-emerald-600', 
-        active: true, // <--- ACTIVADO
+        active: true,
         desc: 'Actúa para que tu equipo adivine en 60s.' 
     },
     { 
@@ -83,19 +92,11 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         name: 'Verdad o Reto', 
         icon: <HelpCircle size={32} />, 
         color: 'from-violet-500 to-purple-700', 
-        active: true, // <--- ACTIVADO
+        active: true,
         desc: 'Confiesa tus secretos o cumple el reto.' 
     },
     
     // --- PRÓXIMAMENTE ---
-    { 
-        id: 'kings', 
-        name: 'Copa del Rey', 
-        icon: <Crown size={32} />, 
-        color: 'from-amber-400 to-yellow-600', 
-        active: false, 
-        desc: 'Cada carta es una regla y un castigo.' 
-    },
     { 
         id: 'bomb', 
         name: 'La Bomba', 
@@ -176,9 +177,11 @@ const App = () => {
       case 'game-culture':
         return <CulturaChupistica onExit={backToMenu} />;
       case 'game-mimic':
-        return <MimicGame onExit={backToMenu} />;       // <--- Nueva Ruta
+        return <MimicGame onExit={backToMenu} />;
       case 'game-truth':
-        return <TruthOrDare onExit={backToMenu} />;     // <--- Nueva Ruta
+        return <TruthOrDare onExit={backToMenu} />;
+      case 'game-king':
+        return <KingGame onExit={backToMenu} />; // <--- Nueva Ruta Activada
       
       default:
         return <GameMenu onSelectGame={(id) => setScreen(`game-${id}`)} />;

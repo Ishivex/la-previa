@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { 
   Play, Ghost, Beer, HelpCircle, ArrowLeft, 
-  Brain, Crown, Bomb, Video, Fingerprint, Lock 
+  Brain, Crown, Bomb, Video, Fingerprint, Lock, 
+  Instagram, Coffee
 } from 'lucide-react';
 import Button from './components/Button';
 
@@ -13,27 +14,43 @@ import CulturaChupistica from './games/cultura-chupistica/CulturaChupistica';
 import MimicGame from './games/mimic/MimicGame';
 import TruthOrDare from './games/truth-or-dare/TruthOrDare';
 import KingGame from './games/king/KingGame';
-import BombGame from './games/bomb/BombGame'; // <--- Nuevo Import de La Bomba
+import BombGame from './games/bomb/BombGame';
 
 // --- PANTALLAS SIMPLES ---
 
 const LandingScreen = ({ onStart }) => (
-  <div className="flex flex-col items-center justify-center min-h-screen text-center p-6 space-y-8 animate-fadeIn">
-    <div className="relative">
+  <div className="flex flex-col items-center justify-center min-h-screen text-center p-6 space-y-8 animate-fadeIn relative">
+    <div className="relative z-10">
       <div className="absolute inset-0 bg-purple-500 blur-3xl opacity-20 rounded-full animate-pulse"></div>
       <h1 className="relative text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-br from-purple-400 via-pink-500 to-indigo-500 drop-shadow-sm tracking-tighter">
         LA<br/>PREVIA
       </h1>
     </div>
-    <p className="text-xl text-gray-400 max-w-md">
+    <p className="text-xl text-gray-400 max-w-md relative z-10">
       La mejor app para romper el hielo antes de la fiesta.
     </p>
-    <div className="w-full max-w-xs">
+    
+    <div className="w-full max-w-xs relative z-10">
       <Button onClick={onStart} variant="neon">
         <Play size={24} /> ENTRAR
       </Button>
     </div>
-    <span className="text-xs text-gray-600 fixed bottom-4">v2.0.0 • React • Tailwind</span>
+
+    {/* --- PIE DE PÁGINA: COMUNIDAD Y APOYO --- */}
+    <div className="fixed bottom-6 left-0 right-0 flex flex-col items-center gap-4 z-20 pointer-events-none">
+        <div className="flex gap-4 pointer-events-auto">
+            <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" 
+               className="p-3 bg-white/5 rounded-full text-pink-400 hover:bg-pink-500/20 hover:scale-110 transition-all cursor-pointer border border-white/5 shadow-lg backdrop-blur-sm">
+                <Instagram size={20} />
+            </a>
+            <a href="https://ko-fi.com/" target="_blank" rel="noopener noreferrer" 
+               className="flex items-center gap-2 px-4 py-2 bg-yellow-500/10 text-yellow-400 rounded-full border border-yellow-500/20 hover:bg-yellow-500/20 hover:scale-105 transition-all cursor-pointer font-bold text-sm shadow-lg backdrop-blur-sm">
+                <Coffee size={18} />
+                <span>Invítame una birra</span>
+            </a>
+        </div>
+        <span className="text-[10px] text-gray-600">v2.1.0 • React • Tailwind</span>
+    </div>
   </div>
 );
 
@@ -57,11 +74,19 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         desc: 'Descubre quién miente entre tus amigos.' 
     },
     { 
+        id: 'truth', 
+        name: 'Verdad o Reto', 
+        icon: <HelpCircle size={32} />, 
+        color: 'from-violet-500 to-purple-700', 
+        active: true, 
+        desc: 'Confiesa tus secretos o cumple el reto.' 
+    },
+    { 
         id: 'bomb', 
         name: 'La Bomba', 
         icon: <Bomb size={32} />, 
         color: 'from-orange-500 to-red-700', 
-        active: true, // <--- ACTIVADO
+        active: true,
         desc: 'Responde rápido antes de que explote.' 
     },
     { 
@@ -95,14 +120,6 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         color: 'from-teal-400 to-emerald-600', 
         active: true,
         desc: 'Actúa para que tu equipo adivine en 60s.' 
-    },
-    { 
-        id: 'truth', 
-        name: 'Verdad o Reto', 
-        icon: <HelpCircle size={32} />, 
-        color: 'from-violet-500 to-purple-700', 
-        active: true,
-        desc: 'Confiesa tus secretos o cumple el reto.' 
     },
     
     // --- PRÓXIMAMENTE (MISTERIO) ---
@@ -192,7 +209,7 @@ const App = () => {
       case 'game-king':
         return <KingGame onExit={backToMenu} />;
       case 'game-bomb':
-        return <BombGame onExit={backToMenu} />; // <--- Nueva Ruta Activada
+        return <BombGame onExit={backToMenu} />;
       
       default:
         return <GameMenu onSelectGame={(id) => setScreen(`game-${id}`)} />;

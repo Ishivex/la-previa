@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Play, Ghost, Beer, HelpCircle, ArrowLeft, 
   Brain, Crown, Bomb, Video, Fingerprint, Lock, 
-  Instagram, Coffee
+  Twitter, Coffee // <--- Cambiado Instagram por Twitter
 } from 'lucide-react';
 import Button from './components/Button';
 
@@ -36,20 +36,23 @@ const LandingScreen = ({ onStart }) => (
       </Button>
     </div>
 
-    {/* --- PIE DE PÁGINA: COMUNIDAD Y APOYO --- */}
+    {/* --- PIE DE PÁGINA ACTUALIZADO --- */}
     <div className="fixed bottom-6 left-0 right-0 flex flex-col items-center gap-4 z-20 pointer-events-none">
         <div className="flex gap-4 pointer-events-auto">
-            <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" 
-               className="p-3 bg-white/5 rounded-full text-pink-400 hover:bg-pink-500/20 hover:scale-110 transition-all cursor-pointer border border-white/5 shadow-lg backdrop-blur-sm">
-                <Instagram size={20} />
+            {/* Enlace a X (Twitter) */}
+            <a href="https://x.com/Ishivex" target="_blank" rel="noopener noreferrer" 
+               className="p-3 bg-white/5 rounded-full text-blue-400 hover:bg-blue-500/20 hover:scale-110 transition-all cursor-pointer border border-white/5 shadow-lg backdrop-blur-sm">
+                <Twitter size={20} />
             </a>
-            <a href="https://ko-fi.com/" target="_blank" rel="noopener noreferrer" 
+            
+            {/* Enlace a Ko-fi */}
+            <a href="https://ko-fi.com/ishivex" target="_blank" rel="noopener noreferrer" 
                className="flex items-center gap-2 px-4 py-2 bg-yellow-500/10 text-yellow-400 rounded-full border border-yellow-500/20 hover:bg-yellow-500/20 hover:scale-105 transition-all cursor-pointer font-bold text-sm shadow-lg backdrop-blur-sm">
                 <Coffee size={18} />
                 <span>Invítame una birra</span>
             </a>
         </div>
-        <span className="text-[10px] text-gray-600">v2.1.0 • React • Tailwind</span>
+        <span className="text-[10px] text-gray-600">v2.1.1 • React • Tailwind</span>
     </div>
   </div>
 );
@@ -86,7 +89,7 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         name: 'La Bomba', 
         icon: <Bomb size={32} />, 
         color: 'from-orange-500 to-red-700', 
-        active: true,
+        active: true, 
         desc: 'Responde rápido antes de que explote.' 
     },
     { 
@@ -110,7 +113,7 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         name: 'Cultura Chupística', 
         icon: <Brain size={32} />, 
         color: 'from-pink-500 to-rose-500', 
-        active: true,
+        active: true, 
         desc: 'Nombra cosas de una categoría sin repetir.' 
     },
     { 
@@ -118,7 +121,7 @@ const GameMenu = ({ onSelectGame, onBack }) => {
         name: 'Mímica', 
         icon: <Video size={32} />, 
         color: 'from-teal-400 to-emerald-600', 
-        active: true,
+        active: true, 
         desc: 'Actúa para que tu equipo adivine en 60s.' 
     },
     
